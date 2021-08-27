@@ -9,6 +9,6 @@
  * It will store that information in the postgres database running in the other docker container
 
 ## Ansible directory
-* Create the YAML files required for deploying
+* Contains YAML files required for deploying DB and python images
 * Ansible playbook for installing Docker, Minikube, and kubectl that creates a deployment in minikube with all of the containers running
 
