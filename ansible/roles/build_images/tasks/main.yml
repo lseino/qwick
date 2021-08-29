@@ -1,0 +1,9 @@
+# You can also use the 'cmd' parameter instead of free form format.
+- name: This command will change default images to be build directly in minikube
+  shell: eval $(minikube docker-env)
+
+- name: Play needed tasks in order
+  include_tasks: "{{ item }}"
+  loop:
+    - build_db.yml
+    - build_scraper.yml

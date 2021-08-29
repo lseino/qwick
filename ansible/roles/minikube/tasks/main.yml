@@ -1,0 +1,17 @@
+---
+- include_tasks: linux.yml
+- name: set facts
+  set_fact:
+    translated_architecture: amd64
+  when: ansible_architecture == 'x86_64'
+
+- name: get binaries
+  get_url: url="{{ item.url }}" dest="{{ item.dest }}"
+  with_items:
+    - url: https://storage.googleapis.com/minikube/releases/{{ minikube_version }}/minikube-{{ ansible_system|lower }}-amd64
+      dest: "{{ minikube_install_dir }}/minikube"
+
+- name: chmod binaries
+  file: dest="{{ minikube_install_dir }}/{{ item }}" mode=0755
+  with_items:
+    - minikube

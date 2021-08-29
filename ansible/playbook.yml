@@ -1,0 +1,10 @@
+---
+# file: webservers.yml
+- hosts: webservers
+  user: root
+  roles:
+    - docker
+    - kubectl
+    - minikube
+    - build_images
+    - deploy_images

@@ -1,0 +1,12 @@
+- name: Ansible copy multiple files with_items
+  copy:
+    src: "../k8_files/{{ item }}"
+    dest: /tmp/{{ item }}
+    mode: 0774
+  with_items:
+    ['config_map.yml','db_deploy.yml','scraper_deploy.yml']
+
+  - name: apply manifest files
+    shell: "kubectl apply -f /tmp/{{ item }}"
+    with_items:
+      ['config_map.yml','db_deploy.yml','scraper_deploy.yml']

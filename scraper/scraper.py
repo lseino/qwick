@@ -1,10 +1,9 @@
 import psycopg2
-import config
 import bs4
 import urllib.request
 from urllib.request import urlopen
 from bs4 import BeautifulSoup as soup
-import configparser
+import os
 
 def retrieve_list():
     #Go to webpage and scrape data
@@ -22,14 +21,14 @@ def retrieve_list():
 def connect():
     """ Connect to the PostgreSQL database server """
     conn = None
-    config = configparser.RawConfigParser()
-    config.read(filenames = 'database.ini')
-    print(config.sections())
+    
+    # Get postgres db info from environmental variables set by config maps
+    
+    h = os.environ.get('POSTGRES_HOST')
+    u = os.environ.get('POSTGRES_USER')
+    p = os.environ.get('POSTGRES_PASSWORD')
+    db = os.environ.get('POSTGRES_DB')
 
-    h = config.get('postgresql','host')
-    u = config.get('postgresql','user')
-    p = config.get('postgresql','pwd')
-    db = config.get('postgresql','db')
     try:
 
         # connect to the PostgreSQL server

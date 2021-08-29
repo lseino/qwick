@@ -1,0 +1,6 @@
+## Dockerfile building variables
+
+postgres_image_name: "postgres_db:v1.0"
+python_scraper_image_name: "python_scraper:v1.0"
+postgres_build_dir: "/root/postgres-dockerfile"
+python_scraper_build_dir: "/root/scraper-dockerfile"
