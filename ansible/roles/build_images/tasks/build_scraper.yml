@@ -1,25 +1,23 @@
 ---
-- hosts: build_host
-  gather_facts: no
-  tasks:
-    - name: create build directory
-      file:
-        path: {"{  python_scraper_build_dir }}"
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
-    - name: copy Dockerfile
-      copy:
-        src: "../scraper/Dockerfile"
-        dest: "{{  python_scraper_build_dir }}/Dockerfile"
-        owner: root
-        group: root
-        mode: '0644'
-    - name: build container image
-      docker_image:
-        name: "{{ python_scraper_image_name }}"
-        build:
-          path: "{{  python_scraper_build_dir }}"
-          source: build
-        state: present
+- name: create build directory
+  file:
+    path: "{{  python_scraper_build_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+- name: copy Dockerfile,scraper.py & requirements.txt
+  copy:
+    src: "../scraper"
+    dest: "{{  python_scraper_build_dir }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: build container image
+  docker_image:
+    name: "{{ python_scraper_image_name }}"
+    build:
+      path: "{{  python_scraper_build_dir }}/scraper"
+    source: build
+    state: present

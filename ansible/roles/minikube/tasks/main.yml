@@ -1,17 +1,31 @@
 ---
-- include_tasks: linux.yml
-- name: set facts
-  set_fact:
-    translated_architecture: amd64
-  when: ansible_architecture == 'x86_64'
+- name: downloading {{ minikube_url }}
+  become: yes
+  become_user: root
+  get_url:
+    url: '{{ minikube_url }}'
+    dest: '{{ minikube_install_target }}'
+    checksum: '{{ minikube_checksum }}'
+    mode: 0755
 
-- name: get binaries
-  get_url: url="{{ item.url }}" dest="{{ item.dest }}"
-  with_items:
-    - url: https://storage.googleapis.com/minikube/releases/{{ minikube_version }}/minikube-{{ ansible_system|lower }}-amd64
-      dest: "{{ minikube_install_dir }}/minikube"
+- name: linking {{ minikube_install_link }} to {{ minikube_install_target }}
+  become: yes
+  become_user: root
+  file:
+    src: '{{ minikube_install_target }}'
+    dest: '{{ minikube_install_link }}'
+    state: link
 
-- name: chmod binaries
-  file: dest="{{ minikube_install_dir }}/{{ item }}" mode=0755
-  with_items:
-    - minikube
+- name: installing drivers...
+  with_items: '{{ minikube_install_drivers | default([]) }}'
+  include_tasks: '{{ item }}.yml'
+
+- name: Change the working directory to somedir/ and run the command as db_owner if /path/to/database does not exist
+  ansible.builtin.command: "sudo usermod -aG docker $USER && newgrp docker"
+  become: yes
+  become_user: ec2-user
+
+- name: Change the working directory to somedir/ and run the command as db_owner if /path/to/database does not exist
+  ansible.builtin.command: "minikube start"
+  become: yes
+  become_user: ec2-user

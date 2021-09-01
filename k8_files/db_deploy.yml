@@ -15,8 +15,8 @@ spec:
         app: postgresql-db
     spec:
       containers:
-        - name: postgres_db
-          image: postgres_db:v1.0
+        - name: postgres-db
+          image: postgres-db:v1.0
           imagePullPolicy: Never
           volumeMounts:
             - name: postgresql-db-disk

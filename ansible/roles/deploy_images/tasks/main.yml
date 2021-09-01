@@ -1,0 +1,20 @@
+- name: Add another bin dir to system-wide $PATH.
+  copy:
+    dest: /etc/profile.d/custom-path.sh
+    content: 'PATH=$PATH:/usr/local/bin'
+
+- name: Ansible copy multiple files with_items
+  copy:
+    src: "../k8_files/{{ item }}"
+    dest: /tmp/{{ item }}
+    mode: 0774
+  with_items:
+    ['config_map.yml','db_deploy.yml','scraper_deploy.yml']
+
+- name: start minikube
+  command: minikube start
+
+- name: apply manifest files
+  command: "kubectl apply -f /tmp/{{ item }}"
+  with_items:
+    ['config_map.yml','db_deploy.yml','scraper_deploy.yml']

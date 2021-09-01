@@ -1,0 +1,15 @@
+---
+kubectl_ver: v1.22.1
+kubectl_platform: amd64
+kubectl_mirror: https://storage.googleapis.com/kubernetes-release/release
+
+kubectl_install_dir: /usr/local/bin
+kubectl_privilege_escalate: True
+
+kubectl_checksums:
+  v1.22.1:
+    linux:
+      # https://storage.googleapis.com/kubernetes-release/release/v1.22.1/bin/linux/amd64/kubectl
+      amd64: sha256:78178a8337fc6c76780f60541fca7199f0f1a2e9c41806bded280a4a5ef665c9
+      # https://storage.googleapis.com/kubernetes-release/release/v1.22.1/bin/linux/arm64/kubectl
+      arm64: sha256:5c7ef1e505c35a8dc0b708f6b6ecdad6723875bb85554e9f9c3fe591e030ae5c

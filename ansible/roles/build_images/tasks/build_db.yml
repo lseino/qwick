@@ -1,25 +1,22 @@
 ---
-- hosts: build_host
-  gather_facts: no
-  tasks:
-    - name: create build directory
-      file:
-        path: "{{ postgres_build_dir }}"
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
-    - name: copy Dockerfile
-      copy:
-        src: "../db/Dockerfile"
-        dest: "{{ postgres_build_dir }}/Dockerfile"
-        owner: root
-        group: root
-        mode: '0644'
-    - name: build container image
-      docker_image:
-        name: "{{ postgres_image_name }}"
-        build:
-          path: "{{ postgres_build_dir }}"
-          source: build
-        state: present
+- name: create build directory
+  file:
+    path: "{{ postgres_build_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+- name: copy Dockerfile
+  copy:
+    src: "../db/Dockerfile"
+    dest: "{{ postgres_build_dir }}/Dockerfile"
+    owner: root
+    group: root
+    mode: '0644'
+- name: build container image
+  docker_image:
+    name: "{{ postgres_image_name }}"
+    build:
+      path: "{{ postgres_build_dir }}"
+    source: build
+    state: present

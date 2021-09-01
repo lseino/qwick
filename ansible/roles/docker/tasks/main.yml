@@ -1,38 +1,65 @@
 ---
-- name: Install aptitude using apt
-  apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+- name: Update all packages
+  yum:
+    name: '*'
+    state: latest
+    update_cache: yes
 
-- name: Install required system packages
-  apt: name={{ item }} state=latest update_cache=yes
-  loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+- name: Ensure a list of yum packages are installed
+  become: yes
+  become_user: root
+  yum:
+    name: "{{ packages }}"
+    state: latest
+    update_cache: yes
+  vars:
+    packages:
+    - python-pip
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+    - amazon-linux-extras
 
-- name: Add Docker GPG apt Key
-  apt_key:
-    url: https://download.docker.com/linux/ubuntu/gpg
-    state: present
+- name: Add extras repository
+  shell: yum-config-manager --enable extras
 
-- name: Add Docker Repository
-  apt_repository:
-    repo: deb https://download.docker.com/linux/ubuntu bionic stable
-    state: present
+- name: Enable Some packages from amazon-linux-extras packages
+  shell: "amazon-linux-extras enable python3.8 ansible2 docker"
 
-- name: Update apt and install docker-ce
-  apt: update_cache=yes name=docker-ce state=latest
+- name: clean yum metadata cache
+  command: yum clean metadata
+  args:
+    warn: false
 
-- name: Install Docker Module for Python
-  pip:
+
+- name: Ensure a list of yum packages are installed
+  become: yes
+  become_user: root
+  yum:
+    name: "{{ packages }}"
+    state: latest
+    update_cache: yes
+  vars:
+    packages:
+    - python3
+    - ansible
+    - docker
+
+- name: Enable Docker CE service at startup
+  service:
     name: docker
+    state: started
+    enabled: yes
 
-- name: Pull default Docker image
-  docker_image:
-    name: "{{ default_container_image }}"
-    source: pull
+- name: Upgrade pip3
+  shell: "python3 -m pip install pip --upgrade"
 
-# Creates the number of containers defined by the variable create_containers, using values from vars file
-- name: Create default containers
-  docker_container:
-    name: "{{ default_container_name }}{{ item }}"
-    image: "{{ default_container_image }}"
-    command: "{{ default_container_command }}"
-    state: present
-  with_sequence: count={{ create_containers }}
+- name: Ensure Python pip packages are installed
+  pip:
+    name: "{{ packages }}"
+    executable: /usr/local/bin/pip3
+  vars:
+    packages:
+    - boto
+    - boto3
+    - docker-compose

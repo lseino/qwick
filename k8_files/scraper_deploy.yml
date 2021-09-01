@@ -25,8 +25,8 @@ spec:
         app: scraper_py
     spec:
       containers:
-      - image: "python_scraper:v1.0"
-        name: python_scraper
+      - image: "python-scraper:v1.0"
+        name: python-scraper
         imagePullPolicy: Never
           # Config from ConfigMap
         envFrom:
