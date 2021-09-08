@@ -24,7 +24,7 @@ spec:
             limits:
               memory: "64Mi"
               cpu: "0.5"
-        imagePullPolicy: Never # These forces minikube to look in its local registry for image
+        imagePullPolicy: Never # This forces minikube to look in its local registry for image
           # Config from ConfigMap
         envFrom:
         - configMapRef:
