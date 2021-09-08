@@ -1,6 +1,6 @@
 # Introduction
 
-This project will deploy a python data scraping application ontop of minikube kubernetes cluster running on an amazon ec2 ubuntu instance. This app will store its data into a postgres database running on the same minikube cluster.
+This project deploys a python data scraping application in minikube kubernetes cluster running on an amazon ubuntu ec2. This app will store its data in a postgres database running on the same minikube cluster.
 
 # Directory Structure
 
@@ -59,6 +59,7 @@ This project will deploy a python data scraping application ontop of minikube ku
    ```
 
 # Requirements
+
    * Basic ubuntu linux, git & kubernetes knowledge
    * An existing AWS Account (edit ~/.aws/credentials with access key id and pass for default profile)
    * existing AWS Key Pair
@@ -69,43 +70,46 @@ This project will deploy a python data scraping application ontop of minikube ku
 
 # Getting Started
 
-Clone Repo 
-```git clone https://github.com/lseino/qwick.git & cd qwick```
+## Clone Repo 
+```git clone https://github.com/lseino/qwick.git```
+```cd qwick```
 
   ## Setting up the instance with terraform
 
    * ```cd terraform``` 
-   * edit the ec2.tf file to add your keypair name ~ ```key_name={keypair_name}```
-   ```RUN``` 
-   * "```terraform init && terraform plan```" .. this plan should bring up 1 ec2 instance
+   * Edit the ec2.tf file to add your keypair name
+      *  ```key_name={keypair_name}``` 
+   * RUN  ```terraform init && terraform plan```  This plan should bring up 1 ec2 instance
    * "```terraform apply```"  if all looks good
-   * This should OUTPUT the ```public_ip``` of the ec2 instance created, copy this as it will be needed in the ansible section
+   * Once complete a ```public_ip``` of the ec2 instance will be printed om console, copy this as it will be needed in the ansible section
 
   ## Deploying the python Application with Ansible
 
-   * ``cd ..`` into ansible directory
+   * cd into ansible directory
    * edit **inventory.ini** file with the public ip of the ec2 instance & path to aws key_pair
-        * ansible_host={{ terraform:public:ip }}
-        * ansible_ssh_private_key_file={{ path/ec2_key_pair/file}}
+   
+        * ```ansible_host={{ terraform:public:ip }}```
+        *``` ansible_ssh_private_key_file={{ path/ec2_key_pair/file}}```
+
    * **Make sure *port 22* is open on the security group attached to the instance**
    * run ```ansible-playbook -i ./inventory.ini playbook.yml``` takes about **5 mins** to run
    
 # To verify application is running
-   * SSH into the ec2 instance using the private key "``ssh -i "path/to/keyfile" ubuntu@{public_ip}``"
-   * switch to minikube user "``su minikube``" & enter minikube password(default="testqwick").
-   * run "```kubectl get pods```" you should see 2 pods running (python_scraper & postgres)
+   * SSH into the ec2 instance using the private key ``ssh -i "path/to/keyfile" ubuntu@{public_ip}``
+   * switch to minikube user ``su minikube`` & enter minikube password(default="testqwick").
+   * run ```kubectl get pods``` you should see 2 pods running (python_scraper & postgres)
       * The scraper is in crashloop mood because the application has completed & terminated
-   * "```kubectl logs {scraper-py** pod_name}```" you should see 20 records inserted in database
+   * ```kubectl logs {scraper-py** pod_name}``` you should see 20 records inserted in database
   
    # To access postgres database to verify 
-   * Run "```sudo apt install postgresql-client-*```"
-   * "```kubectl exec -it {postgre**pod_name} -- bash``` "  opens up postgres container
-   * "```psql -U python scraper```"  opens database
-   * "```select * from scraper_data;```" should see all 20 records
+   * Run ```sudo apt install postgresql-client-*```
+   * ```kubectl exec -it {postgre**pod_name} -- bash```  opens up postgres container
+   * ```psql -U python scraper```  opens database
+   * ```select * from scraper_data;``` should see all 20 records
    * quit ```ctrl+d```
    * ```exit```
  
 
 # To Clean up 
 * ```cd  /ansible/terraform```
-* "```terraform destroy```"
+* ```terraform destroy```
