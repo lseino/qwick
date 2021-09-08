@@ -3,7 +3,7 @@
 This project will deploy a python data scraping application ontop of minikube kubernetes cluster running on an amazon ec2 ubuntu instance. This app will store its data into a postgres database running on the same minikube cluster.
 
 # Directory Structure
-.
+*
 ├── README.md
 ├── ansible
 │   ├── ansible.cfg
@@ -53,7 +53,7 @@ This project will deploy a python data scraping application ontop of minikube ku
     ├── requirements.txt
     ├── scraper.py
     ├── scraper_build.sh
-    └── scraper_deploy.yml
+    └── scraper_deploy.yml*
 
 # Requirements
    * Basic ubuntu linux, git & kubernetes knowledge
