@@ -88,8 +88,8 @@ This project deploys a python data scraping application in minikube kubernetes c
    * cd into ansible directory
    * edit **inventory.ini** file with the public ip of the ec2 instance & path to aws key_pair
    
-         *  ```ansible_host={{ terraform:public:ip }}```
-         *  ``` ansible_ssh_private_key_file={{ path/ec2_key_pair/file}}```
+         *  ansible_host={{ terraform:public:ip }}
+         *  ansible_ssh_private_key_file={{ path/ec2_key_pair/file}}
 
    * **Make sure *port 22* is open on the security group attached to the instance**
    * run ```ansible-playbook -i ./inventory.ini playbook.yml``` takes about **5 mins** to run
