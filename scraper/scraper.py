@@ -4,6 +4,7 @@ import urllib.request
 from urllib.request import urlopen
 from bs4 import BeautifulSoup as soup
 import os
+import time
 
 def retrieve_list():
     #Go to webpage and scrape data
@@ -28,13 +29,13 @@ def connect():
     u = os.environ.get('POSTGRES_USER')
     p = os.environ.get('POSTGRES_PASSWORD')
     db = os.environ.get('POSTGRES_DB')
-
+    #time.sleep(3600)
     try:
 
         # connect to the PostgreSQL server
 
         print('Connecting to the PostgreSQL database...')
-        conn = psycopg2.connect(host=h,database=db,user=u,password=pwd)
+        conn = psycopg2.connect(host=h,database=db,user=u,password=p)
 		
         # create a cursor
         cur = conn.cursor()

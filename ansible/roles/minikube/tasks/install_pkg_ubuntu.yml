@@ -1,0 +1,5 @@
+---
+- name: "Install minikube package Ubuntu 18.04LTS"
+  become: true
+  apt:
+    deb: "{{ _pkg_path }}"

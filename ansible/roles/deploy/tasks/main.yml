@@ -1,0 +1,7 @@
+# Task to install both applications
+
+- name: Play needed tasks in order
+  include_tasks: "{{ item }}"
+  loop:
+    - build_db.yml
+    - build_scraper.yml

@@ -1,0 +1,7 @@
+## Dockerfile building variables
+
+postgres_image_name: "postgres-db:v2.0"
+python_scraper_image_name: "python-scraper:v2.0"
+postgres_build_dir: "/home/minikube/postgres-dockerfile"
+python_scraper_build_dir: "/home/minikube/scraper-dockerfile"
+minikube_usr: "minikube"

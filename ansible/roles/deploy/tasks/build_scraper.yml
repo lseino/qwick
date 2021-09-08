@@ -1,0 +1,25 @@
+---
+- name: create build directory
+  file:
+    path: "{{  python_scraper_build_dir }}"
+    state: directory
+    owner: "{{ minikube_usr }}"
+    group: "{{ minikube_usr }}"
+    mode: '0755'
+
+- name: copy Dockerfile,scraper.py & requirements.txt
+  copy:
+    src: "../scraper"
+    dest: "{{  python_scraper_build_dir }}"
+    mode: '0755'
+    group: "{{ minikube_usr }}"
+    owner: "{{ minikube_usr }}"
+
+- name: Run a docker build script
+  become: true
+  become_user: "{{ minikube_usr }}"
+  async: 45
+  poll: 0
+  shell: "./scraper_build.sh"
+  args:
+     chdir: "{{ python_scraper_build_dir }}/scraper"

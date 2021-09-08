@@ -1,0 +1,81 @@
+---
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+
+- name: Reset fact related to install of minikube
+  set_fact:
+    _install_minikube: false
+
+- name: Set fact if minikube needs to be instaled
+  set_fact:
+    _install_minikube: true
+  when:
+    - "minikube_package not in ansible_facts.packages"
+
+- name: Set fact where the file to install is/will be.
+  set_fact:
+    _pkg_path: "/tmp/{{ minikube_package_url[ansible_distribution | lower] | basename }}"
+  when: _install_minikube | bool
+
+- name: "Download minikube package"
+  become: true
+  get_url:
+    url: "{{ minikube_package_url[ansible_distribution | lower] }}"
+    dest: "{{ _pkg_path }}"
+    force: true
+  when: _install_minikube | bool
+
+- name: "Install minikube package Ubuntu"
+  become: true
+  apt:
+    deb: "{{ _pkg_path }}"
+  when:
+    - _install_minikube | bool
+
+
+- name: Remove temporary file
+  become: true
+  file:
+    path: "{{ _pkg_path }}"
+    state: absent
+  when:
+    - _install_minikube | bool
+
+- name: Copy minikube systemd unit file
+  become: true
+  template:
+    src: minikube.service.j2
+    dest: "/etc/systemd/system/minikube.service"
+    mode: 0644
+    owner: root
+    group: root
+  register: systemd_minikube_template
+  when: _install_minikube | bool
+
+- name: Reload systemd daemon if minikube systemd unit file is changed
+  become: true
+  systemd:
+    daemon_reload: true
+  when:
+    - systemd_minikube_template is changed
+    - _install_minikube | bool
+
+- name: "Start/enable minikube service"
+  become: true
+  service:
+    name: minikube
+    state: started
+    enabled: true
+
+- name: "Make sure 'kubectl' is installed."
+  become: true
+  become_user: "{{ minikube_usr }}"
+  shell: minikube kubectl -- get pods -A
+  register: _list_pods
+
+- name: "Return message from: pcs cluster setup"
+  debug: 
+    msg: "{{ _list_pods.stdout.split('\n') | replace('\\t', '') }}"
+  when:
+    - _list_pods.stdout is defined

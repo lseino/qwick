@@ -1,31 +1,6 @@
 ---
-- name: downloading {{ minikube_url }}
-  become: yes
-  become_user: root
-  get_url:
-    url: '{{ minikube_url }}'
-    dest: '{{ minikube_install_target }}'
-    checksum: '{{ minikube_checksum }}'
-    mode: 0755
+- name: "Setup Minikube user"
+  include_tasks: "user_minikube.yml"
 
-- name: linking {{ minikube_install_link }} to {{ minikube_install_target }}
-  become: yes
-  become_user: root
-  file:
-    src: '{{ minikube_install_target }}'
-    dest: '{{ minikube_install_link }}'
-    state: link
-
-- name: installing drivers...
-  with_items: '{{ minikube_install_drivers | default([]) }}'
-  include_tasks: '{{ item }}.yml'
-
-- name: Change the working directory to somedir/ and run the command as db_owner if /path/to/database does not exist
-  ansible.builtin.command: "sudo usermod -aG docker $USER && newgrp docker"
-  become: yes
-  become_user: ec2-user
-
-- name: Change the working directory to somedir/ and run the command as db_owner if /path/to/database does not exist
-  ansible.builtin.command: "minikube start"
-  become: yes
-  become_user: ec2-user
+- name: "Install Minikube"
+  include_tasks: "install_minikube.yml"

@@ -1,0 +1,25 @@
+---
+- name: create build directory
+  file:
+    path: "{{ postgres_build_dir }}"
+    state: directory
+    owner: "{{ minikube_usr }}"
+    group: "{{ minikube_usr }}"
+    mode: '0755'
+
+- name: copy Db folder
+  copy:
+    src: "../db"
+    dest: "{{ postgres_build_dir }}"
+    mode: '0755'
+    group: "{{ minikube_usr }}"
+    owner: "{{ minikube_usr }}"
+
+- name: Run docker build script
+  become: true
+  become_user: "{{ minikube_usr }}"
+  async: 45
+  poll: 0
+  shell: "./db_build.sh"
+  args:
+     chdir: "{{ postgres_build_dir }}/db"

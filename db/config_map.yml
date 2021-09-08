@@ -1,14 +1,13 @@
-
-# PostgreSQL StatefulSet ConfigMap
+# ConfigMap with postgres environmental variables for initialization
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-db-config
   labels:
-    app: postgresql-db
+    app: postgres
 data:
   POSTGRES_DB: scraper
   POSTGRES_USER: python
   POSTGRES_PASSWORD: postgres-pass
   PGDATA: /data/pgdata
-  POSTGRES_HOST: postgresql-db-service
+  POSTGRES_HOST: postgres

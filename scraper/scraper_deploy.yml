@@ -1,0 +1,32 @@
+# Deploys python scraper application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scraper-py
+spec:
+  selector:
+    matchLabels:
+      app: scraper-py
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: scraper-py
+    spec:
+      containers:
+      - image: "python-scraper:v1.0"
+        name: python-scraper
+        resources:
+            requests:
+              memory: "32Mi"
+              cpu: "125m"
+            limits:
+              memory: "64Mi"
+              cpu: "0.5"
+        imagePullPolicy: Never # These forces minikube to look in its local registry for image
+          # Config from ConfigMap
+        envFrom:
+        - configMapRef:
+            name: postgres-db-config
+

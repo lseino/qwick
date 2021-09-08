@@ -1,65 +1,80 @@
 ---
-- name: Update all packages
-  yum:
-    name: '*'
-    state: latest
-    update_cache: yes
+- name: Update apt cache
+  apt: 
+    update_cache: yes 
+    cache_valid_time: 3600
 
-- name: Ensure a list of yum packages are installed
+- name: Upgrade all apt packages
+  apt: 
+     upgrade: dist
+
+- name: Ensure a list of ubuntu packages are installed
   become: yes
   become_user: root
-  yum:
+  apt:
     name: "{{ packages }}"
     state: latest
     update_cache: yes
   vars:
     packages:
-    - python-pip
-    - yum-utils
-    - device-mapper-persistent-data
-    - lvm2
-    - amazon-linux-extras
-
-- name: Add extras repository
-  shell: yum-config-manager --enable extras
-
-- name: Enable Some packages from amazon-linux-extras packages
-  shell: "amazon-linux-extras enable python3.8 ansible2 docker"
-
-- name: clean yum metadata cache
-  command: yum clean metadata
-  args:
-    warn: false
-
-
-- name: Ensure a list of yum packages are installed
-  become: yes
-  become_user: root
-  yum:
-    name: "{{ packages }}"
-    state: latest
-    update_cache: yes
-  vars:
-    packages:
+    - python3-pip
     - python3
     - ansible
-    - docker
 
-- name: Enable Docker CE service at startup
+- name: Gather the package facts
+  package_facts:
+    manager: auto
+
+- name: Reset fact related to install of Docker
+  set_fact:
+    _install_docker: false
+
+- name: Set fact if Docker needs to be instaled
+  set_fact:
+    _install_docker: true
+  when:
+    - "ansible_facts.packages | intersect(docker_packages) | length < docker_packages | length"
+
+- name: Install Prerequisites
+  become: true
+  package:
+    name: "{{ item }}"
+    state: present
+  register: _pkg_result
+  until: _pkg_result is succeeded
+  when: _install_docker | bool
+  loop: "{{ docker_pre_req[ansible_distribution | lower] }}"
+
+- name: Add an apt signing key for Docker
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add Docker repo
+  become: true
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/{{ ansible_system | lower }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable
+
+
+- name: Install Docker
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+    - docker-ce
+    - docker-ce-cli 
+    - containerd.io
+
+- name: Add user to docker group
+  user:
+    name: "{{ansible_user}}"
+    group: docker
+
+- name: Enable and Start Docker service
+  become: true
   service:
     name: docker
     state: started
     enabled: yes
-
-- name: Upgrade pip3
-  shell: "python3 -m pip install pip --upgrade"
-
-- name: Ensure Python pip packages are installed
-  pip:
-    name: "{{ packages }}"
-    executable: /usr/local/bin/pip3
-  vars:
-    packages:
-    - boto
-    - boto3
-    - docker-compose

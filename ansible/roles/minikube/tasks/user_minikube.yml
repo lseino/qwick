@@ -1,0 +1,44 @@
+---
+- name: "Ensure group 'docker', {{ minikube_grp }} exists"
+  become: true
+  group:
+    name: "{{ item  }}"
+    state: present
+  loop:
+      - docker
+      - "{{ minikube_grp }}"
+
+- name: "Add the user {{ minikube_usr }}"
+  become: true
+  user:
+    name: "{{ minikube_usr }}"
+    comment: "{{ minikube_usr }} user for minikube service"
+    password: "{{ minikube_pass | password_hash('sha512') }}"
+    create_home: True
+    group: "{{ minikube_grp }}"
+    shell: /bin/bash
+
+- name: "Add the user {{ minikube_usr }} to group 'docker'"
+  become: true
+  user:
+    name: "{{ minikube_usr }}"
+    groups: docker
+    append: yes
+
+- name: "Add user'{{ minikube_usr }} to sudo, creating /etc/sudoers.d/{{ minikube_usr }}"
+  become: true
+  lineinfile:
+    path: "/etc/sudoers.d/{{ minikube_usr }}"
+    line: "{{ minikube_usr }} ALL=(ALL) NOPASSWD: ALL"
+    state: present
+    mode: 0440
+    create: yes
+    validate: 'visudo -cf %s'
+
+- name: "Set includedir in sudoers"
+  become: true
+  lineinfile:
+    dest: /etc/sudoers
+    line: "#includedir /etc/sudoers.d"
+    state: present
+    validate: "/usr/sbin/visudo -cf %s"

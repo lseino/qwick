@@ -1,0 +1,21 @@
+docker_packages:
+  - docker-ce-cli
+  - docker-ce
+  - containerd.io
+
+docker_pre_req:
+  ubuntu:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+    - software-properties-common
+
+docker_old_packages:
+  ubuntu:
+    - docker
+    - docker-engine
+    - docker.io
+    - containerd
+    - runc
