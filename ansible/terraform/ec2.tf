@@ -19,7 +19,7 @@ module "ec2_instance" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "~> 3.0"
 
-  name = "qwick_ubuntu"
+  name = "minikube_server"
 
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t2.medium"
